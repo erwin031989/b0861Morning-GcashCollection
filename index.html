@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning and GCash Collection</title>
+    <style>
+        /* Global Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        /* Card Container */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* Table Styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 6px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        input[type="number"], input[type="date"] {
+            width: 90%;
+            padding: 4px;
+            font-size: 12px;
+            box-sizing: border-box;
+        }
+
+        /* Buttons Styling */
+        #buttonContainer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        button {
+            padding: 6px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            flex: 1;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #editButton {
+            background-color: #28A745;
+        }
+        #editButton:hover {
+            background-color: #218838;
+        }
+
+        /* Heading */
+        h3 {
+            text-align: center;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Card Wrapper -->
+    <div class="card">
+        <h3>Morning and GCash Collection</h3>
+
+        <!-- Date Input -->
+        <label for="date">Date:</label>
+        <input type="date" id="date" required>
+        <br><br>
+
+        <!-- Data Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>MF0</th>
+                    <th>Cash</th>
+                    <th>GCash</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MFO 1</td>
+                    <td><input type="number" class="cash" min="0" value="0"></td>
+                    <td><input type="number" class="gcash" min="0" value="0"></td>
+                    <td class="total">0</td>
+                </tr>
+                <tr>
+                    <td>MFO 2</td>
+                    <td><input type="number" class="cash" min="0" value="0"></td>
+                    <td><input type="number" class="gcash" min="0" value="0"></td>
+                    <td class="total">0</td>
+                </tr>
+                <tr>
+                    <td>MFO 3</td>
+                    <td><input type="number" class="cash" min="0" value="0"></td>
+                    <td><input type="number" class="gcash" min="0" value="0"></td>
+                    <td class="total">0</td>
+                </tr>
+                <tr>
+                    <td>MFO 4</td>
+                    <td><input type="number" class="cash" min="0" value="0"></td>
+                    <td><input type="number" class="gcash" min="0" value="0"></td>
+                    <td class="total">0</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td id="grandCash">0</td>
+                    <td id="grandGCash">0</td>
+                    <td id="grandTotal">0</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Buttons -->
+        <div id="buttonContainer">
+            <button onclick="saveData()">SAVE</button>
+            <button onclick="viewData()">VIEW</button>
+            <button id="editButton" onclick="editData()">EDIT</button>
+        </div>
+    </div>
+
+    <script>
+        const cashInputs = document.querySelectorAll('.cash');
+        const gcashInputs = document.querySelectorAll('.gcash');
+        const dateInput = document.getElementById('date');
+
+        // Auto-update totals
+        function updateTotals() {
+            let totalCash = 0;
+            let totalGCash = 0;
+
+            document.querySelectorAll('tbody tr').forEach((row, index) => {
+                const cash = parseFloat(cashInputs[index].value) || 0;
+                const gcash = parseFloat(gcashInputs[index].value) || 0;
+                const rowTotal = cash + gcash;
+
+                row.querySelector('.total').textContent = rowTotal;
+                totalCash += cash;
+                totalGCash += gcash;
+            });
+
+            document.getElementById('grandCash').textContent = totalCash;
+            document.getElementById('grandGCash').textContent = totalGCash;
+            document.getElementById('grandTotal').textContent = totalCash + totalGCash;
+        }
+
+        cashInputs.forEach(input => input.addEventListener('input', updateTotals));
+        gcashInputs.forEach(input => input.addEventListener('input', updateTotals));
+
+        // Clear Table
+        function clearTable() {
+            document.querySelectorAll('.cash, .gcash').forEach(input => input.value = '0');
+            document.querySelectorAll('.total').forEach(cell => cell.textContent = '0');
+            document.getElementById('grandCash').textContent = '0';
+            document.getElementById('grandGCash').textContent = '0';
+            document.getElementById('grandTotal').textContent = '0';
+        }
+
+        // Clear table when a new date is selected
+        dateInput.addEventListener('change', () => {
+            clearTable();
+        });
+
+        // Save Data
+        function saveData() {
+            const date = dateInput.value;
+            if (!date) {
+                alert('Please select a date!');
+                return;
+            }
+
+            const data = [];
+            document.querySelectorAll('tbody tr').forEach((row, index) => {
+                const cash = parseFloat(cashInputs[index].value) || 0;
+                const gcash = parseFloat(gcashInputs[index].value) || 0;
+                data.push({ cash, gcash });
+            });
+
+            const totals = {
+                grandCash: document.getElementById('grandCash').textContent,
+                grandGCash: document.getElementById('grandGCash').textContent,
+                grandTotal: document.getElementById('grandTotal').textContent
+            };
+
+            localStorage.setItem(date, JSON.stringify({ data, totals }));
+            alert('Data saved successfully!');
+            clearTable();
+        }
+
+        // View Data
+        function viewData() {
+            const date = dateInput.value;
+            if (!date) {
+                alert('Please select a date!');
+                return;
+            }
+
+            const savedData = JSON.parse(localStorage.getItem(date));
+            if (!savedData) {
+                alert('No data found for the selected date.');
+                return;
+            }
+
+            savedData.data.forEach((row, index) => {
+                cashInputs[index].value = row.cash;
+                gcashInputs[index].value = row.gcash;
+            });
+
+            updateTotals();
+            alert('Data loaded successfully! You can now edit the data.');
+        }
+
+        // Edit Data
+        function editData() {
+            saveData();
+            alert('Data has been updated successfully!');
+        }
+    </script>
+</body>
+</html>
